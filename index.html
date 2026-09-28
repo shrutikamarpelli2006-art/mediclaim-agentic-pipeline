@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediClaim | Agentic Claim Pipeline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#"><span class="brand-mark">M</span><span>Medi<span>Claim</span></span></a>
+        <p class="eyebrow">Agentic claims workspace</p>
+        <nav aria-label="Claim navigation">
+          <button class="nav-link active" data-view="workspace"><span>▦</span> Claim workspace</button>
+          <button class="nav-link" data-view="queue"><span>◫</span> Review queue <b id="queue-count">0</b></button>
+          <button class="nav-link" data-view="history"><span>◷</span> Claim history</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="compliance"><span>✓</span><div><strong>Human review required</strong><small>Claims remain drafts until approved.</small></div></div>
+          <button class="new-claim" id="new-claim">+ New claim</button>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div><p class="eyebrow">New claim</p><h1 id="claim-title">Untitled claim</h1></div>
+          <div class="header-actions"><span class="session-status"><i></i> Session saved</span><button class="secondary" id="reset-claim">Reset</button></div>
+        </header>
+
+        <section class="progress-wrap" aria-label="Pipeline progress">
+          <div class="progress-line"><span id="progress-fill"></span></div>
+          <div class="steps">
+            <button class="step active" data-step="1"><b>1</b><span>Intake<small>Patient details</small></span></button>
+            <button class="step" data-step="2"><b>2</b><span>Documents<small>Extract records</small></span></button>
+            <button class="step" data-step="3"><b>3</b><span>Medical coding<small>Confirm codes</small></span></button>
+            <button class="step" data-step="4"><b>4</b><span>Validate<small>Resolve gaps</small></span></button>
+            <button class="step" data-step="5"><b>5</b><span>Generate<small>Review claim</small></span></button>
+          </div>
+        </section>
+
+        <section id="workspace-view" class="view active-view">
+          <div class="agent-banner" id="agent-banner"><span class="agent-icon">01</span><div><p class="eyebrow">Active agent</p><strong>Patient &amp; Document Intake Agent</strong><span id="agent-detail">Collecting structured patient and insurance information</span></div><span class="agent-state">READY</span></div>
+
+          <div class="workspace-grid">
+            <section class="panel conversation-panel">
+              <div class="panel-heading"><div><p class="eyebrow">Guided conversation</p><h2>Claim assistant</h2></div><button class="icon-button" id="clear-chat" title="Clear conversation">↺</button></div>
+              <div class="chat-log" id="chat-log" aria-live="polite"></div>
+              <form class="chat-composer" id="chat-form"><input id="chat-input" autocomplete="off" placeholder="Add a note or answer the agent…" /><button aria-label="Send message">↑</button></form>
+            </section>
+
+            <section class="panel data-panel">
+              <div class="panel-heading"><div><p class="eyebrow">Structured record</p><h2>Claim information</h2></div><span class="autosave">● Autosaved</span></div>
+              <form id="claim-form" class="claim-form">
+                <fieldset><legend>Patient</legend><div class="two-col"><label>First name<input name="firstName" placeholder="Avery" /></label><label>Last name<input name="lastName" placeholder="Morgan" /></label></div><div class="two-col"><label>Date of birth<input name="dob" type="date" /></label><label>Member ID<input name="memberId" placeholder="INS-000000" /></label></div></fieldset>
+                <fieldset><legend>Insurance</legend><div class="two-col"><label>Payer<input name="payer" placeholder="HealthFirst" /></label><label>Group number<input name="groupNumber" placeholder="GRP-0000" /></label></div></fieldset>
+                <fieldset><legend>Encounter</legend><label>Service date<input name="serviceDate" type="date" /></label><label>Clinical summary<textarea name="clinicalSummary" rows="3" placeholder="Describe the visit, diagnosis, and treatment…"></textarea></label></fieldset>
+                <button type="button" class="primary full" id="continue-intake">Continue to document intake <span>→</span></button>
+              </form>
+            </section>
+          </div>
+
+          <section class="stage-card hidden" id="documents-stage">
+            <div class="stage-heading"><div><p class="eyebrow">Agent 1 · Document intake</p><h2>Attach clinical documents</h2><p>Upload PDF, TXT, JPG, or PNG records. The intake agent extracts useful clinical text for review.</p></div><span class="stage-badge">OCR READY</span></div>
+            <label class="drop-zone" id="drop-zone"><input id="file-input" type="file" accept=".pdf,.txt,.jpg,.jpeg,.png" multiple /><span class="upload-icon">⇧</span><strong>Drop records here, or choose files</strong><small>Clinical notes, discharge summaries, referrals, and images</small></label>
+            <div id="file-list" class="file-list"></div>
+            <div class="extraction hidden" id="extraction"><div><p class="eyebrow">Extracted clinical information</p><h3 id="extraction-title">Ready for review</h3><p id="extraction-copy"></p></div><button class="primary" id="continue-coding">Review coding suggestions <span>→</span></button></div>
+          </section>
+
+          <section class="stage-card hidden" id="coding-stage">
+            <div class="stage-heading"><div><p class="eyebrow">Agent 2 · Medical information &amp; coding</p><h2>Confirm suggested codes</h2><p>Suggestions are based on the clinical summary and extracted text. Confirm or remove each code before validation.</p></div><span class="stage-badge">HUMAN CONFIRMATION</span></div>
+            <div class="code-layout"><div><p class="subhead">ICD-10 diagnosis</p><div id="icd-codes" class="code-list"></div></div><div><p class="subhead">CPT-4 procedures</p><div id="cpt-codes" class="code-list"></div></div></div>
+            <div class="stage-footer"><button class="secondary" id="add-code">+ Add code</button><button class="primary" id="continue-validation">Validate claim <span>→</span></button></div>
+          </section>
+
+          <section class="stage-card hidden" id="validation-stage">
+            <div class="stage-heading"><div><p class="eyebrow">Agent 3 · Claim validation &amp; workflow</p><h2>Claim readiness check</h2><p>The validation agent checks required patient, payer, encounter, and coding information.</p></div><span class="stage-badge" id="validation-badge">CHECKING</span></div>
+            <div class="validation-grid" id="validation-grid"></div>
+            <div class="validation-summary" id="validation-summary"></div>
+            <div class="stage-footer"><button class="secondary" id="rerun-validation">↻ Run check again</button><button class="primary" id="continue-generation" disabled>Generate CMS-1500 draft <span>→</span></button></div>
+          </section>
+
+          <section class="stage-card hidden" id="generate-stage">
+            <div class="stage-heading"><div><p class="eyebrow">Agent 4 · Claim generation</p><h2>CMS-1500 claim draft</h2><p>Review every field before exporting. This draft does not submit a claim to a payer.</p></div><span class="stage-badge success">READY FOR REVIEW</span></div>
+            <div class="claim-preview" id="claim-preview"></div>
+            <div class="stage-footer"><button class="secondary" id="edit-claim">← Edit claim</button><button class="primary" id="print-claim">Print / save PDF <span>↗</span></button></div>
+          </section>
+        </section>
+
+        <section id="queue-view" class="view empty-view"><div class="empty-icon">✓</div><h2>Review queue</h2><p>Claims that pass validation appear here for final review.</p><button class="primary view-switch" data-target="workspace">Open current claim</button></section>
+        <section id="history-view" class="view empty-view"><div class="empty-icon">◷</div><h2>Claim history</h2><p>Your in-browser claim session is active. Exported drafts remain available from your browser print destination.</p><button class="primary view-switch" data-target="workspace">Return to workspace</button></section>
+      </main>
+    </div>
+    <template id="message-template"><div class="message"><div class="avatar"></div><div class="bubble"></div></div></template>
+    <script src="./app.js"></script>
+  </body>
+</html>
