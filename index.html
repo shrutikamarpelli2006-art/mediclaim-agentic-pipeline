@@ -58,6 +58,7 @@
                 <fieldset><legend>Patient</legend><div class="two-col"><label>First name<input name="firstName" placeholder="Avery" /></label><label>Last name<input name="lastName" placeholder="Morgan" /></label></div><div class="two-col"><label>Date of birth<input name="dob" type="date" /></label><label>Member ID<input name="memberId" placeholder="INS-000000" /></label></div></fieldset>
                 <fieldset><legend>Insurance</legend><div class="two-col"><label>Payer<input name="payer" placeholder="HealthFirst" /></label><label>Group number<input name="groupNumber" placeholder="GRP-0000" /></label></div></fieldset>
                 <fieldset><legend>Encounter</legend><label>Service date<input name="serviceDate" type="date" /></label><label>Clinical summary<textarea name="clinicalSummary" rows="3" placeholder="Describe the visit, diagnosis, and treatment…"></textarea></label></fieldset>
+                <fieldset><legend>Costing factors <small>(optional estimate)</small></legend><div class="two-col"><label>Billed amount<input name="billedAmount" type="number" min="0" step="0.01" placeholder="250.00" /></label><label>Allowed amount<input name="allowedAmount" type="number" min="0" step="0.01" placeholder="180.00" /></label></div><div class="two-col"><label>Deductible remaining<input name="deductibleRemaining" type="number" min="0" step="0.01" placeholder="50.00" /></label><label>Coinsurance %<input name="coinsuranceRate" type="number" min="0" max="100" step="0.01" placeholder="20" /></label></div><label>Copay<input name="copay" type="number" min="0" step="0.01" placeholder="25.00" /></label></fieldset>
                 <button type="button" class="primary full" id="continue-intake">Continue to document intake <span>→</span></button>
               </form>
             </section>
@@ -86,7 +87,7 @@
           <section class="stage-card hidden" id="generate-stage">
             <div class="stage-heading"><div><p class="eyebrow">Agent 4 · Claim generation</p><h2>CMS-1500 claim draft</h2><p>Review every field before exporting. This draft does not submit a claim to a payer.</p></div><span class="stage-badge success">READY FOR REVIEW</span></div>
             <div class="claim-preview" id="claim-preview"></div>
-            <div class="stage-footer"><button class="secondary" id="edit-claim">← Edit claim</button><button class="primary" id="print-claim">Print / save PDF <span>↗</span></button></div>
+            <div class="stage-footer"><button class="secondary" id="edit-claim">← Edit claim</button><div class="header-actions"><button class="secondary" id="download-claim">Download form <span>↓</span></button><button class="primary" id="print-claim">Print / save PDF <span>↗</span></button></div></div>
           </section>
         </section>
 
